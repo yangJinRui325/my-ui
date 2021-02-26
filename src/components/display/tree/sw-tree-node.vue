@@ -1,5 +1,11 @@
 <template>
-    <li class="sw-tree-node">
+    <li
+        class="sw-tree-node"
+        :class="{
+            'is-top': nodeData.isTop,
+            'is-bot': nodeData.isBot,
+        }"
+    >
         <div class="sw-tree-node__content">
             <span
                 class="sw-tree-node__expand-icon"
@@ -9,12 +15,28 @@
                 }"
                 @click="handleIconClick"
             >
-                <i class="el-icon-folder-add"></i>
+                <template v-if="nodeData.children.length !== 0">
+                    <i class="el-icon-folder-opened" v-if="expanded"></i>
+                    <i class="el-icon-folder" v-else></i>
+                </template>
+                <i class="el-icon-user-solid" v-else></i>
             </span>
-            <span class="sw-tree-node__label">{{nodeData.label}}</span>
+            <span
+                class="sw-tree-node__label"
+                :class="{'is-current': nodeData.isCurrent}"
+                @click="handleSelect"
+            >{{nodeData.label}}</span>
         </div>
         <el-collapse-transition>
-            <ul class="sw-tree-node__children" v-if="nodeData.children && expanded">
+            <ul
+                v-if="nodeData.children && expanded"
+                class="sw-tree-node__children"
+                :class="{
+                    'is-top-icon': nodeData.isTop,
+                    'is-bot-icon': nodeData.isBot,
+                    'is-expanded': expanded
+                }"
+            >
                 <sw-tree-node
                     v-for="tree in nodeData.children"
                     :key="tree.clue"
@@ -39,7 +61,7 @@ export default {
     data() {
         return {
             tree: null,
-            expanded: false
+            expanded: false,
         }
     },
     computed: {},
@@ -52,6 +74,10 @@ export default {
         // } else {
         //     this.tree = parent.tree;
         // }
+
+        if (this.nodeData.expanded) {
+            this.expanded = true;
+        }
     },
     mounted: function () {
         console.log(this.nodeData)
@@ -67,6 +93,14 @@ export default {
                 this.expanded = true
                 this.$emit('node-expand', this.nodeData.data, this.nodeData, this);
             }
+        },
+        handleSelect() {
+            if (this.nodeData.isCurrent) {
+                this.nodeData.isCurrent = false
+                this.tree.$emit('node-select', this.nodeData.data, this.nodeData, this);
+            } else {
+                this.nodeData.isCurrent = true
+            }
         }
     }
 }
@@ -79,6 +113,10 @@ export default {
         height: auto;
         background: #fff;
 
+        &.is-bot {
+
+        }
+
         &__content {
             width: 100%;
             height: 40px;
@@ -88,6 +126,12 @@ export default {
 
         &__label {
             padding-left: 10px;
+            cursor: pointer;
+
+            &.is-current {
+                background-color: #d2eafb;
+                color: #2C90F3;
+            }
         }
 
         &__expand-icon {
@@ -98,48 +142,14 @@ export default {
             background: #fff;
             text-align: center;
 
-            &::before {
-                content: "";
-                position: absolute;
-                left: -10px;
-                top: 20px;
-                z-index: 2;
-                width: 100%;
-                height: 1px;
-                border-top: 1px dashed #bbbbbb;
-            }
-
-            &.is-top-icon::after {
-                content: "";
-                position: absolute;
-                left: 10px;
-                top: 20px;
-                z-index: 2;
-                width: 1px;
-                height: 50%;
-                border-left: 1px dashed #bbbbbb;
-            }
-
             &::after {
                 content: "";
                 position: absolute;
-                left: 10px;
-                top: 0;
-                z-index: 2;
-                width: 1px;
-                height: 100%;
-                border-left: 1px dashed #bbbbbb;
-            }
-
-            &.is-bot-icon::after {
-                content: "";
-                position: absolute;
-                left: 10px;
-                top: 0;
-                z-index: 2;
-                width: 1px;
-                height: 50%;
-                border-left: 1px dashed #bbbbbb;
+                left: -50%;
+                top: 50%;
+                width: 50%;
+                height: 1px;
+                border-top: 1px dashed #dddddd;
             }
         }
 
@@ -147,15 +157,14 @@ export default {
             padding-left: 20px;
             position: relative;
 
-            &::before {
+            &::after {
                 content: "";
                 position: absolute;
                 left: 10px;
                 top: 0;
-                z-index: 1;
                 width: 1px;
                 height: 100%;
-                border-left: 1px dashed #bbbbbb;
+                border-left: 1px dashed #dddddd;
             }
         }
     }

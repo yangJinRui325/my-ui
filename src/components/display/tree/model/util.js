@@ -5,6 +5,7 @@ export function changeTreeData(arr, idx) {
             // item.children.length ? 说明有子元素 : 反之没有
             item.clue = `${ idx }-${ index }`
             item.expanded = false
+            item.isCurrent = false
             item.isTop = index === 0 ? true : false
             item.isBot = arr.length - 1 === index ? true : false
             if (item.children) {
@@ -13,4 +14,14 @@ export function changeTreeData(arr, idx) {
         })
     }
     return arr
+}
+
+export function parseToNum(value) {
+    if (value !== undefined) {
+        value = parseInt(value, 10)
+        if (isNaN(value)) {
+            value = null;
+        }
+    }
+    return value
 }

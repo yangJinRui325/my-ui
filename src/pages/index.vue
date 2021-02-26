@@ -56,15 +56,20 @@
                     </so-marquee>
                 </div>
                 <div class="mw__sw-tree" v-if="curMenu === 'tree'">
-                    <sw-tree class="mw__sw-tree-wrapper"></sw-tree>
+                    <sw-tree1 class="mw__sw-tree-wrapper"></sw-tree1>
                 </div>
                 <div class="mw__sw-tree" v-if="curMenu === 'element-tree'">
-                    <el-tree
-                        class="tree-line"
-                        icon-class="el-icon-circle-plus-outline"
-                        :indent="0"
-                        :data="data"
-                    ></el-tree>
+                    <sw-tree
+                        :data="treeData"
+                        :show-line="true"
+                        :show-checkbox="false"
+                        :expand-on-click-node="false"
+                        :highlight-current="true"
+                    >
+                        <!--                        <span slot-scope="{ node }">-->
+                        <!--                            <span>自定义{{ node.label }}</span>-->
+                        <!--                        </span>-->
+                    </sw-tree>
                 </div>
             </el-main>
         </el-container>
@@ -74,12 +79,14 @@
 <script>
 import soMarquee from '@/components/display/so-marquee'
 import swTree from '@/components/display/tree/sw-tree'
+import swTree1 from '@/components/display/tree/sw-tree1'
 
 export default {
     name: 'index',
     components: {
         soMarquee,
-        swTree
+        swTree,
+        swTree1
     },
     props: {},
     data() {
@@ -139,45 +146,78 @@ export default {
                 },
             ],
 
-            data: [{
-                label: '一级 1',
-                children: [{
-                    label: '二级 1-1',
-                    children: [{
-                        label: '三级 1-1-1'
-                    }]
-                }]
-            }, {
-                label: '一级 2',
-                children: [{
-                    label: '二级 2-1',
-                    children: [{
-                        label: '三级 2-1-1'
-                    }]
-                }, {
-                    label: '二级 2-2',
-                    children: [{
-                        label: '三级 2-2-1'
-                    }]
-                }]
-            }, {
-                label: '一级 3',
-                children: [{
-                    label: '二级 3-1',
-                    children: [{
-                        label: '三级 3-1-1'
-                    }]
-                }, {
-                    label: '二级 3-2',
-                    children: [{
-                        label: '三级 3-2-1'
-                    }]
-                }]
-            }],
-            defaultProps: {
-                children: 'children',
-                label: 'label'
-            }
+            treeData: [
+                {
+                    label: '一级 1',
+                    children: [
+                        {
+                            label: '二级 1-1',
+                            children: [
+                                {
+                                    label: '三级 1-1-1',
+                                    children: []
+                                },
+                                {
+                                    label: '三级 1-1-2',
+                                    children: []
+                                },
+                                {
+                                    label: '三级 1-1-3',
+                                    children: []
+                                }
+                            ]
+                        },
+                        {
+                            label: '二级 1-2',
+                            children: [
+                                {
+                                    label: '三级 1-2-1',
+                                    children: []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: '一级 2',
+                    children: [
+                        {
+                            label: '二级 2-1',
+                            children: [
+                                {
+                                    label: '三级 2-1-1',
+                                    children: []
+                                },
+                                {
+                                    label: '三级 2-1-2',
+                                    children: [
+                                        {
+                                            label: '四级 2-1-2-1',
+                                            children: []
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            label: '二级 2-2',
+                            children: [
+                                {
+                                    label: '三级 2-2-1',
+                                    children: []
+                                },
+                                {
+                                    label: '三级 2-2-2',
+                                    children: []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    label: '一级 3',
+                }
+            ]
         }
     },
     computed: {},
@@ -196,14 +236,10 @@ export default {
             this.curMenu = key
         },
 
-        handleNodeClick(data) {
-            console.log(data);
-        },
-
 
         handleMarqueeClick(row) {
             alert(`当前点击的第${ row.id }行`)
-        }
+        },
     }
 }
 </script>
@@ -234,65 +270,4 @@ export default {
     }
 
 
-</style>
-// 以下为scss，记得去掉scoped，或者使用/deep/
-<style lang="scss">
-    .tree-line {
-        .el-tree-node {
-            position: relative;
-            padding-left: 16px; // 缩进量
-        }
-
-        .el-tree-node__children {
-            padding-left: 16px; // 缩进量
-        }
-
-        // 竖线
-        .el-tree-node::before {
-            content: "";
-            height: 100%;
-            width: 1px;
-            position: absolute;
-            left: -3px;
-            top: -26px;
-            border-width: 1px;
-            border-left: 1px dashed #52627C;
-        }
-
-        // 当前层最后一个节点的竖线高度固定
-        .el-tree-node:last-child::before {
-            height: 38px; // 可以自己调节到合适数值
-        }
-
-        // 横线
-        .el-tree-node::after {
-            content: "";
-            width: 24px;
-            height: 20px;
-            position: absolute;
-            left: -3px;
-            top: 12px;
-            border-width: 1px;
-            border-top: 1px dashed #52627C;
-        }
-
-        // 去掉最顶层的虚线，放最下面样式才不会被上面的覆盖了
-        & > .el-tree-node::after {
-            border-top: none;
-        }
-
-        & > .el-tree-node::before {
-            border-left: none;
-        }
-
-        // 展开关闭的icon
-        .el-tree-node__expand-icon {
-            font-size: 16px;
-            // 叶子节点（无子节点）
-            &.is-leaf {
-                color: transparent;
-                // display: none; // 也可以去掉
-            }
-        }
-    }
 </style>
